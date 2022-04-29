@@ -264,9 +264,9 @@ void MainWindow::setupUi()
     mpOpenBtn->setToolTip(tr("Open"));
     mpOpenBtn->setIcon(QIcon(QString::fromLatin1(":/theme/dark/open.svg")));
 
-    mpInfoBtn = new QToolButton();
-    mpInfoBtn->setToolTip(QString::fromLatin1("Media information"));
-    mpInfoBtn->setIcon(QIcon(QString::fromLatin1(":/theme/dark/info.svg")));
+//    mpInfoBtn = new QToolButton();
+//    mpInfoBtn->setToolTip(QString::fromLatin1("Media information"));
+//    mpInfoBtn->setIcon(QIcon(QString::fromLatin1(":/theme/dark/info.svg")));
     mpCaptureBtn = new QToolButton();
     mpCaptureBtn->setToolTip(tr("Capture"));
     mpCaptureBtn->setIcon(QIcon(QString::fromLatin1(":/theme/dark/capture.svg")));
@@ -320,11 +320,11 @@ void MainWindow::setupUi()
     mpMenu->addSeparator();
 
     //mpMenu->addAction(tr("Report"))->setEnabled(false); //report bug, suggestions etc. using maillist?
-    mpMenu->addAction(tr("About"), this, SLOT(about()));
-    mpMenu->addAction(tr("Help"), this, SLOT(help()));
-    mpMenu->addAction(tr("Donate"), this, SLOT(donate()));
-    mpMenu->addAction(tr("Setup"), this, SLOT(setup()));
-    mpMenu->addSeparator();
+//    mpMenu->addAction(tr("About"), this, SLOT(about()));
+//    mpMenu->addAction(tr("Help"), this, SLOT(help()));
+//    mpMenu->addAction(tr("Donate"), this, SLOT(donate()));
+//    mpMenu->addAction(tr("Setup"), this, SLOT(setup()));
+//    mpMenu->addSeparator();
     mpMenuBtn->setMenu(mpMenu);
     mpMenu->addSeparator();
 
@@ -387,7 +387,7 @@ void MainWindow::setupUi()
     mpMenu->addSeparator();
 
     subMenu = new ClickableMenu(tr("Clock"));
-    mpMenu->addMenu(subMenu);
+ //   mpMenu->addMenu(subMenu);
     QActionGroup *ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeClockType(QAction*)));
@@ -403,7 +403,7 @@ void MainWindow::setupUi()
     autoClockAction->setToolTip(tr("Take effect in next playback"));
 
     subMenu = new ClickableMenu(tr("Subtitle"));
-    mpMenu->addMenu(subMenu);
+ //   mpMenu->addMenu(subMenu);
     QAction *act = subMenu->addAction(tr("Enable"));
     act->setCheckable(true);
     act->setChecked(mpSubtitle->isEnabled());
@@ -412,7 +412,7 @@ void MainWindow::setupUi()
     act->setCheckable(true);
     act->setChecked(mpSubtitle->autoLoad());
     connect(act, SIGNAL(toggled(bool)), SLOT(toggleSubtitleAutoLoad(bool)));
-    subMenu->addAction(tr("Open"), this, SLOT(openSubtitle()));
+ //   subMenu->addAction(tr("Open"), this, SLOT(openSubtitle()));
 
     wgt = new QWidget();
     hb = new QHBoxLayout();
@@ -448,13 +448,13 @@ void MainWindow::setupUi()
     box->setToolTip(tr("Auto detect requires libchardet"));
 
     subMenu = new ClickableMenu(tr("Audio track"));
-    mpMenu->addMenu(subMenu);
+//    mpMenu->addMenu(subMenu);
     mpAudioTrackMenu = subMenu;
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeAudioTrack(QAction*)));
     initAudioTrackMenu();
 
     subMenu = new ClickableMenu(tr("Channel"));
-    mpMenu->addMenu(subMenu);
+//    mpMenu->addMenu(subMenu);
     mpChannelMenu = subMenu;
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeChannel(QAction*)));
     subMenu->addAction(tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported); //will set to input in resampler if not supported.
@@ -470,7 +470,7 @@ void MainWindow::setupUi()
     }
 
     subMenu = new QMenu(tr("Aspect ratio"), mpMenu);
-    mpMenu->addMenu(subMenu);
+//    mpMenu->addMenu(subMenu);
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(switchAspectRatio(QAction*)));
     mpARAction = subMenu->addAction(tr("Video"));
     mpARAction->setData(0);
@@ -492,7 +492,7 @@ void MainWindow::setupUi()
     subMenu->addAction(pWA);
 
     subMenu = new ClickableMenu(tr("Decoder"));
-    mpMenu->addMenu(subMenu);
+//    mpMenu->addMenu(subMenu);
     mpDecoderConfigPage = new DecoderConfigPage();
     pWA = new QWidgetAction(0);
     pWA->setDefaultWidget(mpDecoderConfigPage);
@@ -505,7 +505,8 @@ void MainWindow::setupUi()
     VideoRendererId *vo = NULL;
     while ((vo = VideoRenderer::next(vo))) {
         // skip non-widget renderers
-        if (*vo == VideoRendererId_OpenGLWindow || *vo == VideoRendererId_GraphicsItem)
+        if (*vo == VideoRendererId_OpenGLWindow || *vo == VideoRendererId_GraphicsItem || *vo == VideoRendererId_Direct2D
+                || *vo == VideoRendererId_GDI)
             continue;
         QAction *voa = subMenu->addAction(QString::fromLatin1(VideoRenderer::name(*vo)));
         voa->setData(*vo);
@@ -530,13 +531,13 @@ void MainWindow::setupUi()
     controlLayout->addSpacerItem(space);
     controlLayout->addWidget(mpVolumeSlider);
     controlLayout->addWidget(mpVolumeBtn);
-    controlLayout->addWidget(mpCaptureBtn);
+//    controlLayout->addWidget(mpCaptureBtn);
     controlLayout->addWidget(mpPlayPauseBtn);
     controlLayout->addWidget(mpStopBtn);
     controlLayout->addWidget(mpBackwardBtn);
     controlLayout->addWidget(mpForwardBtn);
     controlLayout->addWidget(mpOpenBtn);
-    controlLayout->addWidget(mpInfoBtn);
+//    controlLayout->addWidget(mpInfoBtn);
     controlLayout->addWidget(mpSpeed);
     //controlLayout->addWidget(mpSetupBtn);
     controlLayout->addWidget(mpMenuBtn);
@@ -545,7 +546,7 @@ void MainWindow::setupUi()
     connect(pSpeedBox, SIGNAL(valueChanged(double)), SLOT(onSpinBoxChanged(double)));
     connect(mpOpenBtn, SIGNAL(clicked()), SLOT(openFile()));
     connect(mpPlayPauseBtn, SIGNAL(clicked()), SLOT(togglePlayPause()));
-    connect(mpInfoBtn, SIGNAL(clicked()), SLOT(showInfo()));
+//    connect(mpInfoBtn, SIGNAL(clicked()), SLOT(showInfo()));
     //valueChanged can be triggered by non-mouse event
     connect(mpTimeSlider, SIGNAL(sliderMoved(int)), SLOT(seek(int)));
     connect(mpTimeSlider, SIGNAL(sliderPressed()), SLOT(seek()));
@@ -1392,7 +1393,9 @@ void MainWindow::onMediaStatusChanged()
         break;
     }
     qDebug() << "status changed " << status;
-    setWindowTitle(status + QString::fromLatin1(" ") + mTitle);
+    std::string tempString = " -- 由李珏二次开发";
+    QTextCodec *code = QTextCodec::codecForName("UTF-8");
+    setWindowTitle(status + QString::fromLatin1(" ") + mTitle + code->toUnicode(tempString.c_str()));
 }
 
 void MainWindow::onBufferProgress(qreal percent)

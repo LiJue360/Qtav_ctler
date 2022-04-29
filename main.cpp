@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
     MainWindow window;                                  //设置window窗口参数
     window.setProperty("rendererId", rendererId_from_opt_name(vo.toLower()));
     window.show();
-    window.setWindowTitle(QString::fromLatin1("Qt video player"));
+    window.setWindowTitle(QString::fromLatin1("Qt video player -- Secondary development by LiJue"));
     AppEventFilter ae(&window);
     qApp->installEventFilter(&ae);
 
