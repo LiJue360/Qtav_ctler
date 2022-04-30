@@ -47,6 +47,7 @@ class QTimeEdit;
 class QVBoxLayout;
 class QLabel;
 class QPushButton;
+class QLineEdit;
 class QSpinBox;
 class QTimeEdit;
 QT_END_NAMESPACE
@@ -88,6 +89,7 @@ private slots:
     void updateChannelMenu();
     void switchAspectRatio(QAction* action);
     void toggleRepeat(bool);
+    void toggleDataSend(bool);
     void setRepeateMax(int);
     void changeVO(QAction* action);
     void changeChannel(QAction* action);
@@ -174,6 +176,10 @@ private:
     QLabel *mpCurrent, *mpEnd;
     QLabel *mpTitle;
     QLabel *mpSpeed;
+    QLabel *sendInfo;
+    QLineEdit *ReceiverIP, *ReceiverPort;
+    QLineEdit *SenderPort;
+    QString ReceiverIPText, ReceiverPortText, SenderPortText;
     Slider *mpTimeSlider, *mpVolumeSlider;
     QToolButton *mpVolumeBtn;
     QToolButton *mpPlayPauseBtn;
@@ -183,7 +189,9 @@ private:
     QMenu *mpMenu;
     QAction *mpVOAction, *mpARAction; //remove mpVOAction if vo.id() is supported
     QAction *mpRepeatEnableAction;
+    QAction *mpSendDataEnableAction;
     QWidgetAction *mpRepeatAction;
+    QWidgetAction *mpSendDataAction;
     QSpinBox *mpRepeatBox;
     QTimeEdit *mpRepeatA, *mpRepeatB;
     QAction *mpAudioTrackAction;

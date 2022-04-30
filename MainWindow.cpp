@@ -491,6 +491,41 @@ void MainWindow::setupUi()
     pWA->setDefaultWidget(mpVideoEQ);
     subMenu->addAction(pWA);
 
+    subMenu = new ClickableMenu(tr("Send data"));
+    mpMenu->addMenu(subMenu);
+    mpSendDataEnableAction = subMenu->addAction(tr("Enable"));
+    mpSendDataEnableAction->setCheckable(true);
+    connect(mpSendDataEnableAction, SIGNAL(toggled(bool)), SLOT(toggleDataSend(bool)));
+    ReceiverIP = new QLineEdit(0);
+    QLabel *mpReceiverIPLabel = new QLabel(tr("ReceiverIP："));
+    hb = new QHBoxLayout;
+    hb->addWidget(mpReceiverIPLabel);
+    hb->addWidget(ReceiverIP);
+    vb = new QVBoxLayout;
+    vb->addLayout(hb);
+    ReceiverPort = new QLineEdit(0);
+    QLabel *ReceiverPortLabel = new QLabel(tr("ReceiverPort："));
+    hb = new QHBoxLayout;
+    hb->addWidget(ReceiverPortLabel);
+    hb->addWidget(ReceiverPort);
+    vb->addLayout(hb);
+    SenderPort = new QLineEdit(0);
+    QLabel *SenderPortLabel = new QLabel(tr("SenderPort："));
+    hb = new QHBoxLayout;
+    hb->addWidget(SenderPortLabel);
+    hb->addWidget(SenderPort);
+    vb->addLayout(hb);
+    hb = new QHBoxLayout;
+    sendInfo = new QLabel;
+    hb->addWidget(sendInfo);
+    vb->addLayout(hb);
+    wgt = new QWidget;
+    wgt->setLayout(vb);
+    pWA = new QWidgetAction(0);
+    pWA->setDefaultWidget(wgt);
+    subMenu->addAction(pWA);
+    mpSendDataAction = pWA;
+
     subMenu = new ClickableMenu(tr("Decoder"));
 //    mpMenu->addMenu(subMenu);
     mpDecoderConfigPage = new DecoderConfigPage();
@@ -1256,6 +1291,26 @@ void MainWindow::toggleRepeat(bool r)
             mpPlayer->setTimeRange(0);
         }
     }
+}
+
+void MainWindow::toggleDataSend(bool r)
+{
+    mpSendDataEnableAction->setChecked(r);
+    if(r){
+        ReceiverIPText = ReceiverIP->text();
+        ReceiverPortText = ReceiverPort->text();
+        SenderPortText = SenderPort->text();
+        sendInfo->setText("Set IPs and ports successfully");
+    } else {
+        ReceiverIPText = "";
+        ReceiverIP->setText(ReceiverIPText);
+        ReceiverPortText = "";
+        ReceiverPort->setText(ReceiverPortText);
+        SenderPortText = "";
+        SenderPort->setText(SenderPortText);
+        sendInfo->setText("Stop connection");
+    }
+
 }
 
 void MainWindow::setRepeateMax(int m)
