@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <QUrl>
 
+
 QT_BEGIN_NAMESPACE
 class QWidgetAction;
 class QToolButton;
@@ -34,17 +35,22 @@ class AVError;
 class AVPlayer;
 class AVClock;
 class VideoRenderer;
+
 class LibAVFilterAudio;
 class LibAVFilterVideo;
 class SubtitleFilter;
 class VideoPreviewWidget;
 class DynamicShaderObject;
 class GLSLFilter;
+
+class VideoRendererPrivate;
 }
 QT_BEGIN_NAMESPACE
+
 class QMenu;
 class QTimeEdit;
 class QVBoxLayout;
+class QUdpSocket;
 class QLabel;
 class QPushButton;
 class QLineEdit;
@@ -79,6 +85,7 @@ public slots:
 
 signals:
     void ready();
+    void imageReady();
 
 private slots:
     void stopUnload();
@@ -116,6 +123,7 @@ private slots:
     void onPositionChange(qint64 pos);
     void repeatAChanged(const QTime& t);
     void repeatBChanged(const QTime& t);
+    void VideoSend();
 
     void onTimeSliderHover(int pos, int value);
     void onTimeSliderLeave();
@@ -162,7 +170,7 @@ protected:
 
 private:
     void workaroundRendererSize();
-
+    QByteArray dec2hex2(int a);
 private:
     bool mIsReady, mHasPendingPlay;
     bool mControlOn;
@@ -179,7 +187,8 @@ private:
     QLabel *sendInfo;
     QLineEdit *ReceiverIP, *ReceiverPort;
     QLineEdit *SenderPort;
-    QString ReceiverIPText, ReceiverPortText, SenderPortText;
+    QString ReceiverIPText, ReceiverPortText, SenderPortText, pktlenText;
+    QUdpSocket *udpsocket;
     Slider *mpTimeSlider, *mpVolumeSlider;
     QToolButton *mpVolumeBtn;
     QToolButton *mpPlayPauseBtn;
@@ -223,6 +232,8 @@ private:
     QtAV::VideoPreviewWidget *m_preview;
     QtAV::DynamicShaderObject *m_shader;
     QtAV::GLSLFilter *m_glsl;
+
+    QtAV::VideoRendererPrivate * d;
 };
 
 

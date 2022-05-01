@@ -1,5 +1,6 @@
 TARGET = Player
 QT += sql svg
+QT += network
 ########## template for QtAV app project BEGIN ################
 greaterThan(QT_MAJOR_VERSION, 4) {
   QT += avwidgets
@@ -49,7 +50,8 @@ HEADERS = \
     $$COMMON/Config.h \
     $$COMMON/qoptions.h \
     $$COMMON/ScreenSaver.h \
-    $$COMMON/common_export.h
+    $$COMMON/common_export.h \
+    VideoRenderer_p.h
 
 SOURCES = \
     $$COMMON/common.cpp \
