@@ -186,8 +186,8 @@ private:
     QLabel *mpSpeed;
     QLabel *sendInfo;
     QLineEdit *ReceiverIP, *ReceiverPort;
-    QLineEdit *SenderPort;
-    QString ReceiverIPText, ReceiverPortText, SenderPortText, pktlenText;
+    QLineEdit  *pktlen;
+    QString ReceiverIPText, ReceiverPortText, pktlenText;
     QUdpSocket *udpsocket;
     Slider *mpTimeSlider, *mpVolumeSlider;
     QToolButton *mpVolumeBtn;

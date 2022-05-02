@@ -503,25 +503,27 @@ void MainWindow::setupUi()
     mpSendDataEnableAction = subMenu->addAction(tr("Enable"));
     mpSendDataEnableAction->setCheckable(true);
     connect(mpSendDataEnableAction, SIGNAL(toggled(bool)), SLOT(toggleDataSend(bool)));
-    ReceiverIP = new QLineEdit(0);
+    ReceiverIP = new QLineEdit(this);
     QLabel *mpReceiverIPLabel = new QLabel(tr("ReceiverIP："));
     hb = new QHBoxLayout;
     hb->addWidget(mpReceiverIPLabel);
     hb->addWidget(ReceiverIP);
     vb = new QVBoxLayout;
     vb->addLayout(hb);
-    ReceiverPort = new QLineEdit(0);
+    ReceiverPort = new QLineEdit(this);
     QLabel *ReceiverPortLabel = new QLabel(tr("ReceiverPort："));
     hb = new QHBoxLayout;
     hb->addWidget(ReceiverPortLabel);
     hb->addWidget(ReceiverPort);
     vb->addLayout(hb);
-    SenderPort = new QLineEdit(0);
-    QLabel *SenderPortLabel = new QLabel(tr("SenderPort："));
+
+    pktlen = new QLineEdit(this);
+    QLabel *pktlenLabel = new QLabel(tr("pktlen："));
     hb = new QHBoxLayout;
-    hb->addWidget(SenderPortLabel);
-    hb->addWidget(SenderPort);
+    hb->addWidget(pktlenLabel);
+    hb->addWidget(pktlen);
     vb->addLayout(hb);
+
     hb = new QHBoxLayout;
     sendInfo = new QLabel;
     hb->addWidget(sendInfo);
@@ -532,7 +534,7 @@ void MainWindow::setupUi()
     pWA->setDefaultWidget(wgt);
     subMenu->addAction(pWA);
     mpSendDataAction = pWA;
-    udpsocket = new QUdpSocket(this);
+
 
     subMenu = new ClickableMenu(tr("Decoder"));
 //    mpMenu->addMenu(subMenu);
@@ -1307,16 +1309,15 @@ void MainWindow::toggleDataSend(bool r)
     if(r){
         ReceiverIPText = ReceiverIP->text();
         ReceiverPortText = ReceiverPort->text();
-        SenderPortText = SenderPort->text();
+        pktlenText = pktlen->text();
         sendInfo->setText("Set IPs and ports successfully");
-        udpsocket->bind(QHostAddress::Any,SenderPortText.toInt());
     } else {
         ReceiverIPText = "";
         ReceiverIP->setText(ReceiverIPText);
         ReceiverPortText = "";
         ReceiverPort->setText(ReceiverPortText);
-        SenderPortText = "";
-        SenderPort->setText(SenderPortText);
+        pktlenText = "";
+        pktlen->setText(pktlenText);
         sendInfo->setText("Stop connection");
     }
 
@@ -1552,47 +1553,49 @@ QByteArray MainWindow::dec2hex2(int a)
 void MainWindow::VideoSend()
 {
 //    DPTR_D(VideoRenderer);
-    static int n = 0;
-    QByteArray sendbyte;
-    QByteArray head;  // 定义包头
-    head.append(1);//包头首字节赋值为1，作为一帧第一包的标志
-    int l=d->video_frame.width(); //int的存储是小端模式，低位在前，frame.cols和frame.rows
-    int h=d->video_frame.height(); //是32位的，而QByteArray每个元素是16位的
-    head.append(dec2hex2(l),2);//写入一行长度(.append为追加行长数据)
-    head.append(dec2hex2(h),2);//这里int分两次取2byte，存储在相邻两个单元
-
-    qDebug()<<"第 "<<++n<<"frame 帧";
-    qDebug()<<"head = "<<head.toHex();
-    qDebug()<<"The size of head is "<<head.size();
-    // 定义将要发送的数据
-
-    QByteArray byte;
-    QBuffer buffer(&byte);//缓冲区绑定数据源
-    buffer.open(QIODevice::WriteOnly);
-
-    buffer.write(d->video_frame.data());
-    //每帧图像分包，分多次发送，总大小为ByteLen，每次发送的大小为sendLen，比较//可知是否完整发完本帧的数据。
-    int ByteLen = byte.size();
-    int sendLen = 0;
-    qDebug()  << "byte.size :" << ByteLen;
-
-  while(ByteLen > sendLen )
+    if(!ReceiverIPText.isEmpty())
     {
-     // 填充要发送的数据
-        sendbyte.append (head);//加上每包数据的3byte
-        sendbyte.append (byte.mid(sendLen,pktlenText.toInt()));// 在ui界面文本框中设置分包大小
-     //发送
-        int len = udpsocket->writeDatagram(sendbyte,sendbyte.size(),QHostAddress(ReceiverIPText),ReceiverPortText.toInt());
-        //总发送长度减去head的长度，得到有效数据的发送长度
-    sendLen += len-head.size();
-        qDebug() <<"本次发送出数据长度为 this time:" << len-head.size()
-        << "已发送数据长度为 Has been sent：" << sendLen << " 此帧像素数据总长度为 The total length：" << ByteLen ;
-        sendbyte.clear();
-        udpsocket->flush();
-        head[0]=0x00;//除了一帧第一包的包头外，其余包的包头首字节均赋值为0，作//为一帧非第一包标志
-    }
-    byte.clear();
+        static int n = 0;
+        QByteArray sendbyte;
+        QByteArray head;  // 定义包头
+        head.append(1);//包头首字节赋值为1，作为一帧第一包的标志
+        int l=d->video_frame.width(); //int的存储是小端模式，低位在前，frame.cols和frame.rows
+        int h=d->video_frame.height(); //是32位的，而QByteArray每个元素是16位的
+        head.append(dec2hex2(l),2);//写入一行长度(.append为追加行长数据)
+        head.append(dec2hex2(h),2);//这里int分两次取2byte，存储在相邻两个单元
 
+        qDebug()<<"第 "<<++n<<"frame 帧";
+        qDebug()<<"head = "<<head.toHex();
+        qDebug()<<"The size of head is "<<head.size();
+        // 定义将要发送的数据
+
+        QByteArray byte;
+        QBuffer buffer(&byte);//缓冲区绑定数据源
+        buffer.open(QIODevice::WriteOnly);
+
+        buffer.write(d->video_frame.data());
+        //每帧图像分包，分多次发送，总大小为ByteLen，每次发送的大小为sendLen，比较//可知是否完整发完本帧的数据。
+        int ByteLen = byte.size();
+        int sendLen = 0;
+        qDebug()  << "byte.size :" << ByteLen;
+
+      while(ByteLen > sendLen )
+        {
+         // 填充要发送的数据
+            sendbyte.append (head);//加上每包数据的3byte
+            sendbyte.append (byte.mid(sendLen,pktlenText.toInt()));// 在ui界面文本框中设置分包大小
+         //发送
+            int len = udpsocket->writeDatagram(sendbyte,sendbyte.size(),QHostAddress(ReceiverIPText),ReceiverPortText.toInt());
+            //总发送长度减去head的长度，得到有效数据的发送长度
+        sendLen += len-head.size();
+            qDebug() <<"本次发送出数据长度为 this time:" << len-head.size()
+            << "已发送数据长度为 Has been sent：" << sendLen << " 此帧像素数据总长度为 The total length：" << ByteLen ;
+            sendbyte.clear();
+            udpsocket->flush();
+            head[0]=0x00;//除了一帧第一包的包头外，其余包的包头首字节均赋值为0，作//为一帧非第一包标志
+        }
+        byte.clear();
+    }
 }
 
 void MainWindow::onCaptureConfigChanged()
